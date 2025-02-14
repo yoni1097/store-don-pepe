@@ -1,26 +1,22 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { PassportStrategy } from "@nestjs/passport";
-import { User } from "@prisma/client";
-import { ExtractJwt, Strategy } from "passport-jwt";
-import { UsersService } from "src/users/users.service";
-
-
-
+import { Strategy } from 'passport-local';
+import { PassportStrategy } from '@nestjs/passport';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { AuthService } from './auth.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy){
-    constructor(private readonly userService: UsersService){
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+export class LocalStrategy extends PassportStrategy(Strategy) {
+  constructor(private authService: AuthService) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    super();
+  }
 
-        super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            secretOrKey: 'your-secret-key',
-
-        });
+  async validate(username: number, pass: string): Promise<any> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const user = await this.authService.validateUser(username, pass);
+    if (!user) {
+      throw new UnauthorizedException();
     }
-
-
-
-    async validate(payload: {sub:number, email: string}): Promise<User> {
-        return this.userService.findOne(payload.sub);
-    }
+    return user;
+  }
 }
