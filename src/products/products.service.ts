@@ -1,4 +1,3 @@
-import { Product } from './entities/product.entity';
 
 import { Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
